@@ -179,18 +179,42 @@
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Get submit button
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
+            
             // Get form data
             const formData = new FormData(contactForm);
-            const data = Object.fromEntries(formData);
-
-            // Here you would typically send the data to your server
-            console.log('Form submitted with data:', data);
-
-            // Show success message (you can customize this)
-            alert('Thank you for your message! We will get back to you soon.');
             
-            // Reset form
-            contactForm.reset();
+            // Send to PHP handler
+            fetch('contact-handler.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Success message
+                    alert(data.message);
+                    contactForm.reset();
+                } else {
+                    // Error message
+                    alert(data.message || 'Failed to send message. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to send message. Please try again or email us directly at info@borafoundation.com');
+            })
+            .finally(() => {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            });
         });
     }
 
