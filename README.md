@@ -17,13 +17,3 @@ Project Structure
 Getting Started
 Deployment to Hostinger
 Customization
-Browser Support
-Performance Tips
-Support
-Footer
-© 2025 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
