@@ -1,0 +1,75 @@
+========================================
+HOW TO ADD PORTFOLIO IMAGES
+========================================
+
+STEP 1: UPLOAD YOUR IMAGES
+---------------------------
+Via Hostinger File Manager:
+1. Log into Hostinger panel (hpanel.hostinger.com)
+2. Click "File Manager"
+3. Navigate to: public_html/images/
+4. Click "Upload Files"
+5. Select your photos
+6. Rename them to: gallery-1.jpg, gallery-2.jpg, gallery-3.jpg, etc.
+
+Via WinSCP:
+1. Connect to your FTP
+2. Go to the images folder
+3. Drag your photos from computer
+4. Rename them to: gallery-1.jpg, gallery-2.jpg, gallery-3.jpg, etc.
+
+CURRENT IMAGES NEEDED:
+- gallery-1.jpg (Sewing machines close-up)
+- gallery-2.jpg (Group with sewing machines)
+- gallery-3.jpg (Mother with baby and sewing machine)
+- gallery-4.jpg (Family/education support)
+- gallery-5.jpg (Community impact/mattress scene)
+
+
+STEP 2: ADD MORE IMAGES (OPTIONAL)
+-----------------------------------
+To add a 6th, 7th, 8th image, etc.:
+
+1. Upload new image as gallery-6.jpg (or gallery-7.jpg, etc.)
+
+2. Open index.html in WinSCP editor (right-click → Edit)
+
+3. Find the Portfolio section (around line 257)
+
+4. Copy this template and paste it before </div>:
+
+    <div class="gallery-item" data-aos="fade-up" data-aos-delay="500">
+        <img src="images/gallery-6.jpg" alt="Your description" loading="lazy" onerror="this.style.display='none'">
+        <div class="gallery-overlay">
+            <h4>Your Title</h4>
+            <p>Your description</p>
+        </div>
+    </div>
+
+5. Change:
+   - gallery-6.jpg to your image name
+   - "Your Title" to image title
+   - "Your description" to what the image shows
+   - Increase data-aos-delay by 100 for each new image (500, 600, 700, etc.)
+
+6. Save and upload index.html
+
+
+STEP 3: VIEW YOUR PORTFOLIO
+----------------------------
+1. Upload index.html (if you made changes)
+2. Go to your website
+3. Click "Gallery" in the menu
+4. Scroll to Portfolio section
+5. Your images will display automatically!
+
+
+TIPS:
+-----
+- Use JPG format for photos
+- Keep file sizes under 1MB for faster loading
+- Use descriptive file names
+- Images will auto-hide if file doesn't exist
+- Grid adjusts automatically to number of images
+
+========================================

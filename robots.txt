@@ -1,0 +1,25 @@
+# BORA FOUNDATION - robots.txt
+# This file tells search engines how to crawl your website
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /*.pdf$
+Disallow: /.git/
+Disallow: /.htaccess
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://borafoundation.com/sitemap.xml
+
+# For Googlebot
+User-agent: Googlebot
+Allow: /
+
+# For Bingbot
+User-agent: Bingbot
+Allow: /
