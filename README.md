@@ -134,10 +134,3 @@ git commit -m "Final deployment: KaiTech updates, layout fixes, and AWS Tunnel i
 git push origin main
 ```
 
-**IMPORTANT SECURITY NOTE:**
-Do **NOT** upload the `bora key.pem` file to a public GitHub repository. Doing so will compromise your AWS server entirely. Always ensure it is added to a `.gitignore` file before running the commit commands.
-
-```bash
-# To safely ignore the SSH key:
-echo "bora key.pem" >> .gitignore
-```
