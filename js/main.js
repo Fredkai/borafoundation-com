@@ -1,432 +1,332 @@
 /**
- * BORA FOUNDATION - Main JavaScript
- * Modern, interactive functionality for the website
+ * BORA FOUNDATION — main.js
+ * Clean NGO website · Redesigned 2026
  */
 
-(function() {
-    'use strict';
+(function () {
+  'use strict';
 
-    // ========================================
-    // Initialize AOS (Animate On Scroll)
-    // ========================================
-    if (typeof AOS !== 'undefined') {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
-            once: true,
-            mirror: false,
-            offset: 100
-        });
+  /* ================================================================
+     AOS INIT
+  ================================================================ */
+  if (typeof AOS !== 'undefined') {
+    AOS.init({ duration: 800, easing: 'ease-out-quad', once: true, offset: 80 });
+  }
+
+  /* ================================================================
+     HEADER SCROLL
+  ================================================================ */
+  const header = document.getElementById('header');
+  function onScroll() {
+    if (window.scrollY > 80) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
     }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
 
-    // ========================================
-    // Mobile Navigation Toggle
-    // ========================================
-    const navToggle = document.getElementById('nav-toggle');
-    const navMenu = document.getElementById('nav-menu');
-    const navLinks = document.querySelectorAll('.nav-link');
+  /* ================================================================
+     MOBILE NAV TOGGLE
+  ================================================================ */
+  const navToggle = document.getElementById('nav-toggle');
+  const navMenu   = document.getElementById('nav-menu');
 
-    if (navToggle) {
-        navToggle.addEventListener('click', function() {
-            navToggle.classList.toggle('active');
-            navMenu.classList.toggle('active');
-            document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
-        });
-    }
-
-    // Close mobile menu when clicking nav links
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            navMenu.classList.remove('active');
-            navToggle.classList.remove('active');
-            document.body.style.overflow = '';
-        });
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', function () {
+      const isOpen = navMenu.classList.toggle('active');
+      navToggle.classList.toggle('active', isOpen);
+      navToggle.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
 
-    // ========================================
-    // Sticky Header on Scroll
-    // ========================================
-    const header = document.getElementById('header');
-    
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 100) {
-            header.classList.add('scrolled');
+    // Close on nav-link click
+    navMenu.querySelectorAll('.nav-link').forEach(function (link) {
+      link.addEventListener('click', function () {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+        navToggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  // Close nav on resize to desktop
+  window.addEventListener('resize', debounce(function () {
+    if (window.innerWidth > 768 && navMenu) {
+      navMenu.classList.remove('active');
+      navToggle && navToggle.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }, 200));
+
+  /* ================================================================
+     ACTIVE NAV LINK ON SCROLL
+  ================================================================ */
+  const sections = document.querySelectorAll('section[id]');
+
+  function updateActiveLink() {
+    const scrollY = window.pageYOffset;
+    sections.forEach(function (section) {
+      const top    = section.offsetTop - 110;
+      const bottom = top + section.offsetHeight;
+      const id     = section.getAttribute('id');
+      const link   = document.querySelector('.nav-link[href="#' + id + '"]');
+      if (link) {
+        if (scrollY >= top && scrollY < bottom) {
+          link.classList.add('active');
         } else {
-            header.classList.remove('scrolled');
+          link.classList.remove('active');
         }
+      }
     });
+  }
 
-    // ========================================
-    // Active Navigation Link on Scroll
-    // ========================================
-    const sections = document.querySelectorAll('section[id]');
-    
-    function scrollActive() {
-        const scrollY = window.pageYOffset;
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
 
-        sections.forEach(section => {
-            const sectionHeight = section.offsetHeight;
-            const sectionTop = section.offsetTop - 100;
-            const sectionId = section.getAttribute('id');
-            const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                navLink?.classList.add('active');
-            } else {
-                navLink?.classList.remove('active');
-            }
-        });
-    }
-
-    window.addEventListener('scroll', scrollActive);
-
-    // ========================================
-    // Smooth Scroll for Anchor Links
-    // ========================================
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            
-            // Skip if it's just #
-            if (href === '#') {
-                e.preventDefault();
-                return;
-            }
-
-            const targetElement = document.querySelector(href);
-            
-            if (targetElement) {
-                e.preventDefault();
-                const offsetTop = targetElement.offsetTop - 70; // Account for fixed header
-
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        });
+  /* ================================================================
+     SMOOTH SCROLL FOR ANCHOR LINKS
+  ================================================================ */
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href === '#') { e.preventDefault(); return; }
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        const top = target.offsetTop - 70;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
     });
+  });
 
-    // ========================================
-    // Scroll to Top Button
-    // ========================================
-    const scrollTopBtn = document.getElementById('scroll-top');
+  /* ================================================================
+     SCROLL TO TOP BUTTON
+  ================================================================ */
+  const scrollTopBtn = document.getElementById('scroll-top');
 
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 300) {
-            scrollTopBtn?.classList.add('active');
-        } else {
-            scrollTopBtn?.classList.remove('active');
-        }
-    });
-
+  window.addEventListener('scroll', function () {
     if (scrollTopBtn) {
-        scrollTopBtn.addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
+      scrollTopBtn.classList.toggle('active', window.scrollY > 350);
     }
+  }, { passive: true });
 
-    // ========================================
-    // Counter Animation for Impact Numbers
-    // ========================================
-    const impactNumbers = document.querySelectorAll('.impact-number');
-    let countStarted = false;
+  if (scrollTopBtn) {
+    scrollTopBtn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
-    function animateCounter(element, target, duration = 2000) {
-        const start = 0;
-        const increment = target / (duration / 16); // 60fps
-        let current = start;
+  /* ================================================================
+     GALLERY LIGHTBOX
+  ================================================================ */
+  const galleryItems   = document.querySelectorAll('.gallery-item');
+  const lightbox       = document.getElementById('lightbox');
+  const lightboxImg    = document.getElementById('lightbox-img');
+  const lightboxCap    = document.getElementById('lightbox-caption');
+  const lightboxClose  = document.getElementById('lightbox-close');
+  const lightboxPrev   = document.getElementById('lightbox-prev');
+  const lightboxNext   = document.getElementById('lightbox-next');
 
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                element.textContent = target.toLocaleString();
-                clearInterval(timer);
-            } else {
-                element.textContent = Math.floor(current).toLocaleString();
-            }
-        }, 16);
+  let currentIndex = 0;
+
+  function openLightbox(index) {
+    const item    = galleryItems[index];
+    const imgSrc  = item.getAttribute('data-img') || item.querySelector('img').src;
+    const caption = item.getAttribute('data-caption') || '';
+    currentIndex  = index;
+    lightboxImg.src = imgSrc;
+    lightboxImg.alt = caption;
+    lightboxCap.textContent = caption;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+    setTimeout(function () { lightboxImg.src = ''; }, 300);
+  }
+
+  galleryItems.forEach(function (item, i) {
+    item.addEventListener('click', function () { openLightbox(i); });
+    item.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
+    });
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('role', 'button');
+    item.setAttribute('aria-label', 'View: ' + (item.getAttribute('data-caption') || 'image'));
+  });
+
+  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (lightbox) lightbox.addEventListener('click', function (e) { if (e.target === lightbox) closeLightbox(); });
+
+  if (lightboxPrev) {
+    lightboxPrev.addEventListener('click', function (e) {
+      e.stopPropagation();
+      currentIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
+      openLightbox(currentIndex);
+    });
+  }
+
+  if (lightboxNext) {
+    lightboxNext.addEventListener('click', function (e) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + 1) % galleryItems.length;
+      openLightbox(currentIndex);
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (!lightbox || !lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft')   lightboxPrev && lightboxPrev.click();
+    if (e.key === 'ArrowRight')  lightboxNext && lightboxNext.click();
+  });
+
+  /* ================================================================
+     DONATE — AMOUNT PILL SELECTION
+  ================================================================ */
+  window.selectAmount = function (btn, amount) {
+    document.querySelectorAll('.amount-pill').forEach(function (p) { p.classList.remove('selected'); });
+    btn.classList.add('selected');
+    const customInput = document.getElementById('custom-amount');
+    if (customInput) { customInput.value = ''; }
+    // Update PayPal link dynamically if possible
+    const paypalBtn = document.getElementById('paypal-donate-btn');
+    if (paypalBtn) {
+      paypalBtn.href = 'https://www.paypal.me/DinahBora/' + amount;
     }
+  };
 
-    function checkImpactSection() {
-        const impactSection = document.getElementById('impact');
-        if (!impactSection || countStarted) return;
+  // Custom amount input clears pill selection
+  const customAmountInput = document.getElementById('custom-amount');
+  if (customAmountInput) {
+    customAmountInput.addEventListener('input', function () {
+      document.querySelectorAll('.amount-pill').forEach(function (p) { p.classList.remove('selected'); });
+      const paypalBtn = document.getElementById('paypal-donate-btn');
+      if (paypalBtn && this.value) {
+        paypalBtn.href = 'https://www.paypal.me/DinahBora/' + this.value;
+      }
+    });
+  }
 
-        const rect = impactSection.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+  /* ================================================================
+     CONTACT FORM
+  ================================================================ */
+  const contactForm = document.getElementById('contact-form');
 
-        if (isVisible && !countStarted) {
-            countStarted = true;
-            impactNumbers.forEach(number => {
-                const target = parseInt(number.getAttribute('data-target'));
-                animateCounter(number, target);
-            });
-        }
-    }
+  if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
 
-    window.addEventListener('scroll', checkImpactSection);
-    checkImpactSection(); // Check on page load
+      const submitBtn = document.getElementById('contact-submit-btn');
+      const originalHTML = submitBtn.innerHTML;
+      const name    = document.getElementById('contact-name').value.trim();
+      const email   = document.getElementById('contact-email').value.trim();
+      const subject = document.getElementById('contact-subject').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
 
-    // ========================================
-    // Form Submission Handler
-    // ========================================
-    const contactForm = document.querySelector('.contact-form');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get submit button
-            const submitBtn = contactForm.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            // Disable button and show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
-            
-            // Get form data
-            const formData = new FormData(contactForm);
-            
-            // Send to PHP handler
-            fetch('contact-handler.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Success message
-                    alert(data.message);
-                    contactForm.reset();
-                } else {
-                    // Error message
-                    alert(data.message || 'Failed to send message. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to send message. Please try again or email us directly at info@borafoundation.com');
-            })
-            .finally(() => {
-                // Re-enable button
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            });
-        });
-    }
+      // Basic validation
+      if (!name || !email || !subject || !message) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast('Please enter a valid email address.', 'error');
+        return;
+      }
 
-    // ========================================
-    // Newsletter Form Handler
-    // ========================================
-    const newsletterForm = document.querySelector('.newsletter-form');
-    
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = this.querySelector('input[type="email"]').value;
-            
-            // Here you would typically send the email to your server
-            console.log('Newsletter subscription:', email);
+      // Show loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
 
-            // Show success message
-            alert('Thank you for subscribing to our newsletter!');
-            
-            // Reset form
-            this.reset();
-        });
-    }
+      const formData = new FormData(contactForm);
 
-    // ========================================
-    // Gallery Image Click Handler (Optional)
-    // ========================================
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    
-    galleryItems.forEach(item => {
-        item.addEventListener('click', function() {
-            // You can implement a lightbox here
-            console.log('Gallery item clicked');
-            // Example: open image in modal or lightbox
+      fetch('contact-handler.php', { method: 'POST', body: formData })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            showToast(data.message || 'Message sent! We\'ll be in touch soon.', 'success');
+            contactForm.reset();
+          } else {
+            showToast(data.message || 'Something went wrong. Please try again.', 'error');
+          }
+        })
+        .catch(function () {
+          showToast('Could not send message. Please email us directly at info@borafoundation.com', 'error');
+        })
+        .finally(function () {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHTML;
         });
     });
+  }
 
-    // ========================================
-    // Lazy Loading for Images
-    // ========================================
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    if (img.dataset.src) {
-                        img.src = img.dataset.src;
-                        img.removeAttribute('data-src');
-                    }
-                    observer.unobserve(img);
-                }
-            });
-        });
+  /* ================================================================
+     TOAST NOTIFICATION
+  ================================================================ */
+  function showToast(message, type) {
+    const toast    = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+    const toastIcon= document.getElementById('toast-icon');
+    if (!toast) return;
+    toastMsg.textContent = message;
+    toast.className = 'toast' + (type === 'error' ? ' error' : '');
+    toastIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    toast.classList.add('show');
+    setTimeout(function () { toast.classList.remove('show'); }, 5000);
+  }
 
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            imageObserver.observe(img);
-        });
-    }
+  /* ================================================================
+     DYNAMIC YEAR IN FOOTER
+  ================================================================ */
+  const yearEl = document.getElementById('footer-year');
+  if (yearEl) { yearEl.textContent = new Date().getFullYear(); }
 
-    // ========================================
-    // Parallax Effect for Hero Section (Optional)
-    // ========================================
-    const hero = document.querySelector('.hero');
-    
-    if (hero) {
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const parallax = scrolled * 0.5;
-            hero.style.transform = `translateY(${parallax}px)`;
-        });
-    }
-
-    // ========================================
-    // Dynamic Year in Footer
-    // ========================================
-    const currentYear = new Date().getFullYear();
-    const yearElement = document.querySelector('.footer-bottom p');
-    
-    if (yearElement && yearElement.textContent.includes('2025')) {
-        yearElement.textContent = yearElement.textContent.replace('2025', currentYear);
-    }
-
-    // ========================================
-    // Prevent Form Submission on Enter (except textarea)
-    // ========================================
-    document.querySelectorAll('input:not([type="submit"])').forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-            }
-        });
+  /* ================================================================
+     PREVENT ENTER KEY SUBMIT ON TEXT INPUTS (except textarea)
+  ================================================================ */
+  document.querySelectorAll('input:not([type="submit"])').forEach(function (input) {
+    input.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); }
     });
+  });
 
-    // ========================================
-    // Add Loading Animation Class
-    // ========================================
-    window.addEventListener('load', function() {
-        document.body.classList.add('loaded');
-        
-        // Fade in elements sequentially
-        const fadeElements = document.querySelectorAll('.fade-in');
-        fadeElements.forEach((element, index) => {
-            setTimeout(() => {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
+  /* ================================================================
+     PAGE LOAD FADE IN
+  ================================================================ */
+  window.addEventListener('load', function () {
+    document.body.classList.add('loaded');
+  });
+
+  /* ================================================================
+     ACCESSIBILITY: SKIP LINK
+  ================================================================ */
+  const skipLink = document.querySelector('.skip-link');
+  if (skipLink) {
+    skipLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      const main = document.getElementById('main-content');
+      if (main) { main.setAttribute('tabindex', '-1'); main.focus(); }
     });
+  }
 
-    // ========================================
-    // Accessibility: Skip to main content
-    // ========================================
-    const skipLink = document.querySelector('.skip-link');
-    
-    if (skipLink) {
-        skipLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) {
-                mainContent.setAttribute('tabindex', '-1');
-                mainContent.focus();
-            }
-        });
-    }
+  /* ================================================================
+     UTILITY: DEBOUNCE
+  ================================================================ */
+  function debounce(fn, wait) {
+    let t;
+    return function () {
+      clearTimeout(t);
+      t = setTimeout(fn.bind(this, arguments), wait);
+    };
+  }
 
-    // ========================================
-    // Handle Window Resize
-    // ========================================
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            // Close mobile menu on resize to desktop
-            if (window.innerWidth > 768) {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }, 250);
-    });
-
-    // ========================================
-    // Console Welcome Message
-    // ========================================
-    console.log('%c BORA FOUNDATION ', 'background: #2e61d2; color: #ffffff; font-size: 20px; padding: 10px;');
-    console.log('%c Empowering Communities, Transforming Lives ', 'color: #384259; font-size: 14px;');
-
-    // ========================================
-    // Debug Mode (can be removed in production)
-    // ========================================
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.log('Debug mode active');
-        
-        // Log section positions for debugging
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'd' && e.ctrlKey) {
-                console.table(
-                    Array.from(sections).map(section => ({
-                        id: section.id,
-                        top: section.offsetTop,
-                        height: section.offsetHeight
-                    }))
-                );
-            }
-        });
-    }
+  /* ================================================================
+     CONSOLE BRAND
+  ================================================================ */
+  console.log('%c BORA FOUNDATION ', 'background:#1d7050;color:#fff;font-size:18px;padding:8px 16px;border-radius:4px;');
+  console.log('%c Helping Hands, Transforming Lives ', 'color:#2e8b62;font-size:13px;');
 
 })();
-
-// ========================================
-// Additional Utility Functions
-// ========================================
-
-/**
- * Debounce function to limit function calls
- */
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-/**
- * Throttle function to limit function execution
- */
-function throttle(func, limit) {
-    let inThrottle;
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    };
-}
-
-/**
- * Check if element is in viewport
- */
-function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-}
