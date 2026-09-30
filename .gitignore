@@ -50,6 +50,3 @@ yarn-debug.log*
 # Misc
 .DS_Store
 *.pem
-*.key
-*.key.pub
-id_*
